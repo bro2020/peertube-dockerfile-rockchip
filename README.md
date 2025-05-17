@@ -9,3 +9,9 @@ Example:
 ```
 docker build --force-rm --build-arg PEERTUBE_VERSION=develop -t 'peertube-rockchip' .
 ```
+
+Builded image available on Docker Hub:
+
+```
+docker pull bro2020/peertube-rockchip:latest
+```
