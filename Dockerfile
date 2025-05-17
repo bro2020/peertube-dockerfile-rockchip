@@ -152,7 +152,7 @@ USER peertube
 
 RUN git clone https://github.com/Chocobozzz/PeerTube.git /app && \
     git checkout ${PEERTUBE_VERSION} && \
-    cp ./support/docker/production ./ && \
+    cp -rf ./support/docker/production ./ && \
     rm -rf .git .github .gitignore .gitpod.yml support
 
 # Install manually client dependencies to apply our network timeout option
