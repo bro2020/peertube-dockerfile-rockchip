@@ -207,7 +207,8 @@ RUN sed -i 's|main|main non-free non-free-firmware|' /etc/apt/sources.list.d/deb
     rm -vrf /usr/local/share/doc/* && \
     rm -vrf /usr/local/share/man/* && \
     mkdir /data /config && \
-    chown -R peertube:peertube /data /config
+    chown -R peertube:peertube /data /config && \
+    cp ./production/entrypoint.sh /usr/local/bin/entrypoint.sh
 
 ENV NODE_ENV=production
 ENV NODE_CONFIG_DIR=/app/config:/app/production/config:/config
@@ -216,7 +217,6 @@ ENV PEERTUBE_LOCAL_CONFIG=/config
 VOLUME /data
 VOLUME /config
 
-COPY ./production/entrypoint.sh /usr/local/bin/entrypoint.sh
 ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
 
 # Expose API, RTMP and RTMPS ports
