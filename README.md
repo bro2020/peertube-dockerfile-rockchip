@@ -1,2 +1,11 @@
 # peertube-dockerfile-rockchip
 A special peertube image dockerfile for devices with rockchip CPUs with support for hardware acceleration ffmpeg-rockchip
+
+The build uses the `ffmpeg-rockchip` project:
+
+- https://github.com/nyanmisaka/ffmpeg-rockchip
+
+Example:
+```
+docker build --force-rm --build-arg PEERTUBE_VERSION=develop -t 'peertube-rockchip' .
+```
