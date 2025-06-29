@@ -76,13 +76,7 @@ RUN git clone https://github.com/Chocobozzz/PeerTube.git /app && \
     rm -rf .git .github .gitignore .gitpod.yml support
 
 # Install manually client dependencies to apply our network timeout option
-RUN for file in $(grep -r '=\${scaleFilterValue}'|cut -d: -f1 | sort -u);do \
-      sed -i 's|=\${scaleFilterValue}|:\${scaleFilterValue}|' $file; \
-    done && \
-    for file in $(grep -r 'pix_fmt' packages | cut -d: -f1 | sort -u ); do \
-      sed -i '/pix_fmt/d' $file ; \
-    done && \
-    if [ "${ALREADY_BUILT}" = 0 ]; then \
+RUN if [ "${ALREADY_BUILT}" = 0 ]; then \
       npm run install-node-dependencies -- --network-timeout 1200000 && \
       npm run build; \
     else \
