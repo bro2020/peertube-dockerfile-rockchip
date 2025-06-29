@@ -32,106 +32,27 @@ RUN groupadd -r -g ${PEERTUBE_GID:-${DEFAULT_PEERTUBE_GID}} peertube && \
     useradd -r -u ${PEERTUBE_UID:-${DEFAULT_PEERTUBE_UID}} -g peertube -m peertube && \
     mkdir /app && chown peertube:peertube /app
 
-# Build ffmpeg for rockchip
+# Install ffmpeg
 FROM base AS ffmpeg
-ARG WORKDIR='/tmp'
-WORKDIR "${WORKDIR}"
 
-# Install deps
-RUN sed -i 's|main|main non-free non-free-firmware|' /etc/apt/sources.list.d/debian.sources && \
-    apt update -qq && apt install -y --no-install-recommends --no-install-suggests\
-      autoconf \
-      automake \
-      build-essential \
-      cmake \
-      git-core \
-      libass-dev \
-      libfreetype6-dev \
-      libgnutls28-dev \
-      libmp3lame-dev \
-      libtool \
-      meson \
-      ninja-build \
-      pkg-config \
-      texinfo \
-      wget \
-      yasm \
-      nasm \
-      zlib1g-dev \
-      libvpx-dev \
-      libfdk-aac-dev \
-      libdav1d-dev \
-      libx264-dev \
-      libx265-dev \
-      libnuma-dev \
-      libopus-dev \
-      libaom-dev \
-      libva-dev \
-      libvdpau-dev \
-      libvorbis-dev \
-      libxcb1-dev \
-      libxcb-shm0-dev \
-      libxcb-xfixes0-dev \
-      libdrm-dev && \
+ARG FFMPEG_VERSION=7.1
+
+RUN apt update && \
+    apt install xz-utils -y --no-install-recommends --no-install-suggests && \
+    curl -sL "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n${FFMPEG_VERSION}-latest-linuxarm64-gpl-${FFMPEG_VERSION}.tar.xz" \
+    -o /tmp/ffmpeg.tar.xz && \
+    tar -xf /tmp/ffmpeg.tar.xz --transform "s/ffmpeg-n${FFMPEG_VERSION}-latest-linuxarm64-gpl-${FFMPEG_VERSION}\/bin/usr\/local\/bin/" \
+    ffmpeg-n${FFMPEG_VERSION}-latest-linuxarm64-gpl-${FFMPEG_VERSION}/bin/ffmpeg && \
+    tar -xf /tmp/ffmpeg.tar.xz --transform "s/ffmpeg-n${FFMPEG_VERSION}-latest-linuxarm64-gpl-${FFMPEG_VERSION}\/bin/usr\/local\/bin/" \
+    ffmpeg-n${FFMPEG_VERSION}-latest-linuxarm64-gpl-${FFMPEG_VERSION}/bin/ffprobe && \
+    apt purge xz-utils -y --autoremove && \
+    rm -rf /tmp/ffmpeg.tar.xz && \
+    rm -rf /var/lib/apt/lists/* && \
+    rm -rf /var/cache/apt/* && \
     rm -vrf /usr/share/doc/* && \
     rm -vrf /usr/share/man/* && \
     rm -vrf /usr/local/share/doc/* && \
     rm -vrf /usr/local/share/man/*
-
-# Build MPP
-RUN mkdir -p build && cd build && \
-    git clone -b jellyfin-mpp --depth=1 https://github.com/nyanmisaka/mpp.git rkmpp && \
-    pushd rkmpp && \
-    mkdir rkmpp_build && \
-    pushd rkmpp_build && \
-    cmake \
-      -DCMAKE_INSTALL_PREFIX=/usr/local \
-      -DCMAKE_BUILD_TYPE=Release \
-      -DBUILD_SHARED_LIBS=ON \
-      -DBUILD_TEST=OFF \
-      .. && \
-    make -j $(nproc) && \
-    make install && \
-# Build RGA
-    cd ${WORKDIR}/build && \
-    git clone -b jellyfin-rga --depth=1 https://github.com/nyanmisaka/rk-mirrors.git rkrga && \
-    meson setup rkrga rkrga_build \
-      --prefix=/usr/local \
-      --libdir=lib \
-      --buildtype=release \
-      --default-library=shared \
-      -Dcpp_args=-fpermissive \
-      -Dlibdrm=false \
-      -Dlibrga_demo=false && \
-    meson configure rkrga_build && \
-    ninja -C rkrga_build install && \
-# Build ffmpeg
-    git clone --depth=1 https://github.com/nyanmisaka/ffmpeg-rockchip.git ffmpeg && \
-    cd ffmpeg && \
-    echo '6.1.1' > VERSION && \
-    ./configure \
-      --prefix=/usr/local \
-      --extra-libs="-lpthread -lm" \
-      --extra-version=2+b1 \
-      --disable-ffplay \
-      --enable-gnutls \
-      --enable-gpl \
-      --enable-nonfree \
-      --enable-libass \
-      --enable-libfreetype \
-      --enable-libfdk-aac \
-      --enable-libvpx \
-      --enable-libdav1d \
-      --enable-libx264 \
-      --enable-libx265 \
-      --enable-libmp3lame \
-      --enable-libaom \
-      --enable-version3 \
-      --enable-libdrm \
-      --enable-rkmpp \
-      --enable-rkrga && \
-    make -j $(nproc) && \
-    make install
 
 FROM base AS build
 
