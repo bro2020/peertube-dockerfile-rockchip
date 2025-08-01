@@ -7,7 +7,7 @@ The build uses the `ffmpeg-rockchip` project:
 
 Example:
 ```
-docker build --force-rm --build-arg PEERTUBE_VERSION=develop -t 'peertube-rockchip' .
+docker build --force-rm --build-arg PEERTUBE_VERSION=v7.2.3 -t 'peertube-rockchip' .
 ```
 
 Builded image available on Docker Hub:
