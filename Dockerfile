@@ -1,4 +1,4 @@
-FROM node:22-bookworm-slim AS base
+FROM node:22-trixie-slim AS base
 SHELL ["/bin/bash", "-c"]
 
 # Install dependencies
@@ -189,13 +189,13 @@ RUN sed -i 's|main|main non-free non-free-firmware|' /etc/apt/sources.list.d/deb
       libva-x11-2 \
       libfdk-aac2 \
       libaom3 \    
-      libdav1d6 && \
+      libdav1d7 && \
     apt install -y \
       libass9 \    
       libmp3lame0 \
-      libvpx7 \    
+      libvpx9 \    
       libx264-164 \
-      libx265-199 \
+      libx265-215 \
       libvdpau1 \
       libxcb-shape0 \
       libxcb-shm0 && \  
